@@ -47,7 +47,26 @@ public class ProdutosDAO {
     
     public ArrayList<ProdutosDTO> listarProdutos(){
         
-        
+        String sql = "SELECT * FROM filmes";
+        try {
+            conn = conectaDAO.connectDB();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ProdutosDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try{
+            prep = conn.prepareStatement(sql);
+            resultset = prep.executeQuery();
+            while(resultset.next()){
+                ProdutosDTO objdadosdto = new ProdutosDTO();
+                objdadosdto.setNome(resultset.getString("nome"));
+                objdadosdto.setValor(resultset.getInt("valor"));
+                objdadosdto.setStatus(resultset.getString("status"));
+                
+                boolean add = listagem.add(objdadosdto);
+            }
+        } catch (SQLException erro){
+            JOptionPane.showMessageDialog(null, "Dados Pesquisar: " + erro);
+        }
         return listagem;
     }
     
