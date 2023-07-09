@@ -1,3 +1,3 @@
-Nome do projeto: Leilões
-Explicação sobre o que se trata o projeto: O projeto se trata de inicialização do versionamento do projeto Leilões. O código foi disponibilizado pelo SENAC e fui responsável por inclui-lo em meu repositório do GitHub, assim como no repositório local em meu computador. 
-Tecnologias utilizadas (exemplo: Java e MySQL): MySQL, NetBeans, GitBash
+Leilões
+O projeto Leilões é um sistema desenvolvido para uma casa de Leilões e seu objetivo é facilitar as atividades do negócio, oferecendo recursos que agilizam seus sistemas e controles que devem ser realizados diáriamente. 
+Tecnologias utilizadas (exemplo: Java e MySQL): MySQL, NetBeans e GitBash
