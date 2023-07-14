@@ -14,8 +14,7 @@ import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 
 
 public class ProdutosDAO {
@@ -28,50 +27,135 @@ public class ProdutosDAO {
     public void cadastrarProduto (ProdutosDTO produto) throws SQLException, ClassNotFoundException{
         
         
-        String sql = "INSERT INTO filmes (nome, valor) VALUES (?,?);";
-        conn = conectaDAO.connectDB();
-        prep = conn.prepareStatement(sql);
-        
-        try{
-            prep.setString(1, produto.getNome());
-            prep.setInt(2, produto.getValor());
-            
-            prep.execute();
-            prep.close();
-        } catch (SQLException erro) {
-            JOptionPane.showMessageDialog(null, "Dados Cadastrar:" + erro);
-        }
-        
-        
-    }
-    
-    public ArrayList<ProdutosDTO> listarProdutos(){
-        
-        String sql = "SELECT * FROM filmes";
-        try {
-            conn = conectaDAO.connectDB();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ProdutosDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try{
-            prep = conn.prepareStatement(sql);
-            resultset = prep.executeQuery();
-            while(resultset.next()){
-                ProdutosDTO objdadosdto = new ProdutosDTO();
-                objdadosdto.setNome(resultset.getString("nome"));
-                objdadosdto.setValor(resultset.getInt("valor"));
-                objdadosdto.setStatus(resultset.getString("status"));
-                
-                boolean add = listagem.add(objdadosdto);
+        conectaDAO dao = new conectaDAO();
+        Connection conn = dao.connectDB();
+
+        String sql = "INSERT INTO produtos (nome, valor, status) VALUES (?, ?, ?)";
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, produto.getNome());
+            statement.setInt(2, produto.getValor());
+            statement.setString(3, produto.getStatus());
+
+            statement.executeUpdate();  // Executa a operação de inserção
+            JOptionPane.showMessageDialog(null, "Produto cadastrado com sucesso");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao cadastrar o produto.  (" + e.getMessage() + ")");
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    System.out.println("Erro ao fechar a conexão com o banco de dados: " + e.getMessage());
+                }
             }
-        } catch (SQLException erro){
-            JOptionPane.showMessageDialog(null, "Dados Pesquisar: " + erro);
         }
-        return listagem;
+        
     }
     
+    public void venderProdutos (int id) throws ClassNotFoundException
+    {
+        conectaDAO dao = new conectaDAO();
+        Connection conn = dao.connectDB();
+
+        String sql = "UPDATE produtos SET status = 'Vendido' WHERE id = ?";
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, id);
+
+            statement.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Produto vendido com sucesso");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao vender o produto. (" + e.getMessage() + ")");
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    System.out.println("Erro ao fechar a conexão com o banco de dados: " + e.getMessage());
+                }
+            }
+        }
+    }
     
-    
+    public ArrayList<ProdutosDTO> listarProdutos(ArrayList<ProdutosDTO> venderProdutos) throws ClassNotFoundException{
         
+        List<ProdutosDTO> produtos = new ArrayList<>();
+
+        Connection conn = null;
+        try {
+            conn = new conectaDAO().connectDB();
+
+            String sql = "SELECT * FROM produtos";
+
+            try (PreparedStatement statement = conn.prepareStatement(sql)) {
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+
+                    while (resultSet.next()) {
+                        int id = resultSet.getInt("id");
+                        String nome = resultSet.getString("nome");
+                        int valor = resultSet.getInt("valor");
+                        String status = resultSet.getString("status");
+
+                        ProdutosDTO produto = new ProdutosDTO(id, nome, valor, status);
+                        produtos.add(produto);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar produtos: " + e.getMessage());
+        } finally {
+
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    System.out.println("Erro ao fechar a conexão com o banco de dados: " + e.getMessage());
+                }
+            }
+        }
+
+        return (ArrayList<ProdutosDTO>) produtos;
+    }
+        
+        public List<ProdutosDTO> listarProdutosVendidos() throws ClassNotFoundException {
+        List<ProdutosDTO> produtos = new ArrayList<>();
+
+        Connection conn = null;
+        try {
+            conn = new conectaDAO().connectDB();
+
+            String sql = "SELECT * FROM produtos WHERE status LIKE 'Vendido'";
+
+            try (PreparedStatement statement = conn.prepareStatement(sql)) {
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+
+                    while (resultSet.next()) {
+                        int id = resultSet.getInt("id");
+                        String nome = resultSet.getString("nome");
+                        int valor = resultSet.getInt("valor");
+                        String status = resultSet.getString("status");
+
+                        ProdutosDTO produto = new ProdutosDTO(id, nome, valor, status);
+                        produtos.add(produto);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar produtos: " + e.getMessage());
+        } finally {
+
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    System.out.println("Erro ao fechar a conexão com o banco de dados: " + e.getMessage());
+                }
+            }
+        }
+
+        return produtos;
+    }
+
 }
 
