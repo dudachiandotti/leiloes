@@ -20,6 +20,10 @@ public class ProdutosDTO {
         this.status = status;
     }
 
+    ProdutosDTO() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     public Integer getId() {
         return id;
     }
